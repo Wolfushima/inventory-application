@@ -401,14 +401,14 @@ async function createCameraInstances() {
         cameraInstanceCreate(8, cameras[2], 'Black', 'Excellent', 1100),
         cameraInstanceCreate(9, cameras[3], 'Black', 'Excellent', 238),
         cameraInstanceCreate(
-            9,
+            10,
             cameras[3],
             'Black',
             'For Parts or Not Working',
             64.99,
         ),
         cameraInstanceCreate(
-            9,
+            11,
             cameras[3],
             'Black',
             'For Parts or Not Working',

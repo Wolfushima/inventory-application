@@ -69,6 +69,7 @@ exports.index = asyncHandler(async (req, res, next) => {
         ]).exec(),
         CameraType.countDocuments({}).exec(),
     ]);
+
     res.render('index', {
         title: 'Camera Store Home',
         camera_count: numCameras,
@@ -83,7 +84,16 @@ exports.index = asyncHandler(async (req, res, next) => {
 
 // Display list of all Cameras.
 exports.camera_list = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Camera list');
+    const allCameras = await Camera.find({})
+        .select('name brand')
+        .populate('brand')
+        .exec();
+
+    console.log(allCameras);
+    res.render('camera_list', {
+        title: 'Camera List',
+        camera_list: allCameras,
+    });
 });
 
 // Display detail page for a specific Camera.

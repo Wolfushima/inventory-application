@@ -1,0 +1,13 @@
+extends ../layout.pug
+
+block content 
+    h1= title 
+
+    ul 
+        each camera in camera_list 
+            li 
+                a(href=camera.url) #{camera.name}
+                |   (#{camera.brand.name})
+
+        else 
+            li There are no cameras.

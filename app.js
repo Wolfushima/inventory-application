@@ -24,6 +24,7 @@ async function main() {
 app.set('views', [
     path.join(__dirname, 'views'),
     path.join(__dirname, 'views/camera'),
+    path.join(__dirname, 'views/camera-instance'),
 ]);
 app.set('view engine', 'pug');
 

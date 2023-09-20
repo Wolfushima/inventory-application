@@ -1,0 +1,19 @@
+extends ../layout.pug
+
+block content 
+    h1= title 
+
+    ul 
+        each val in camerainstance_list 
+            li 
+                a(href=val.url) #{val.camera.name} (#{val.color}) - $#{val.price}  
+                if val.condition=='New' | val.condition=='Excellent'
+                    span.text-success.font-italic #{val.condition}
+                else if val.condition=='Very Good' | val.condition=='Good'
+                    span.text-warning.font-italic #{val.condition}
+                else
+                    span.text-danger.font-italic #{val.condition}
+                if val.condition!='New'
+                    span  (Used)
+        else 
+            li There are no camera units in the store.

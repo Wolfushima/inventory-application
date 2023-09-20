@@ -3,7 +3,15 @@ const CameraInstance = require('../models/camera-instance');
 
 // Display list of all CameraInstances.
 exports.camerainstance_list = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance list');
+    const allCameraInstances = await CameraInstance.find()
+        .populate('camera')
+        .sort('camera')
+        .exec();
+
+    res.render('camerainstance_list', {
+        title: 'Camera Instance List',
+        camerainstance_list: allCameraInstances,
+    });
 });
 
 // Display detail page for a specific CameraInstances.

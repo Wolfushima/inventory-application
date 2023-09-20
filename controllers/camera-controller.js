@@ -1,8 +1,84 @@
 const asyncHandler = require('express-async-handler');
 const Camera = require('../models/camera');
+const Brand = require('../models/brand');
+const CameraCategory = require('../models/camera-category');
+const CameraType = require('../models/camera-type');
+const CameraInstance = require('../models/camera-instance');
 
 exports.index = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Site Home Page');
+    const [{ _id: digitalCategoryId }, { _id: filmCategoryId }] =
+        await CameraCategory.find({
+            name: ['Digital', 'Film'],
+        })
+            .select('_id')
+            .exec();
+    const [
+        numCameras,
+        numCameraInstances,
+        numBrands,
+        numCameraCategories,
+        [{ digitalCameraInstancesCount: numDigitalCameraInstances }],
+        [{ filmCameraInstancesCount: numFilmCameraInstances }],
+        numCameraTypes,
+    ] = await Promise.all([
+        Camera.countDocuments({}).exec(),
+        CameraInstance.countDocuments({}).exec(),
+        Brand.countDocuments({}).exec(),
+        CameraCategory.countDocuments({}).exec(),
+        Camera.aggregate([
+            {
+                $lookup: {
+                    from: 'camerainstances',
+                    localField: '_id',
+                    foreignField: 'camera',
+                    as: 'instances',
+                },
+            },
+            {
+                $match: {
+                    camera_category: digitalCategoryId,
+                },
+            },
+            {
+                $unwind: '$instances',
+            },
+            {
+                $count: 'digitalCameraInstancesCount',
+            },
+        ]).exec(),
+        Camera.aggregate([
+            {
+                $lookup: {
+                    from: 'camerainstances',
+                    localField: '_id',
+                    foreignField: 'camera',
+                    as: 'instances',
+                },
+            },
+            {
+                $match: {
+                    camera_category: filmCategoryId,
+                },
+            },
+            {
+                $unwind: '$instances',
+            },
+            {
+                $count: 'filmCameraInstancesCount',
+            },
+        ]).exec(),
+        CameraType.countDocuments({}).exec(),
+    ]);
+    res.render('index', {
+        title: 'Camera Store Home',
+        camera_count: numCameras,
+        camera_instance_count: numCameraInstances,
+        brand_count: numBrands,
+        camera_category_count: numCameraCategories,
+        camera_instance_digital_count: numDigitalCameraInstances,
+        camera_instance_film_count: numFilmCameraInstances,
+        camera_type_count: numCameraTypes,
+    });
 });
 
 // Display list of all Cameras.

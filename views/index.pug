@@ -1,5 +1,18 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+    h1= title
+    p Welcome to #[em Camera Store].
+
+    h1 Dynamic content
+
+    p The Camera Store has the following record counts:
+
+    ul
+        li #[strong Cameras (Models):] !{camera_count}
+        li #[strong Cameras:] !{camera_instance_count}
+        li #[strong Brands:] !{brand_count}
+        li #[strong Camera Categories:] !{camera_category_count}
+        li #[strong Digital Cameras:] !{camera_instance_digital_count}
+        li #[strong Film Cameras:] !{camera_instance_film_count}
+        li #[strong Camera Types:] !{camera_type_count}

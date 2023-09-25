@@ -3,7 +3,14 @@ const CameraCategory = require('../models/camera-category');
 
 // Display list of all CameraCategories.
 exports.cameracategory_list = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraCategory list');
+    const allCameraCategories = await CameraCategory.find({})
+        .select('name')
+        .exec();
+
+    res.render('cameracategory_list', {
+        title: 'Camera Categories List',
+        cameracategory_list: allCameraCategories,
+    });
 });
 
 // Display detail page for a specific CameraCategory.

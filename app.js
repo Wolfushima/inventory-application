@@ -26,6 +26,7 @@ app.set('views', [
     path.join(__dirname, 'views/camera'),
     path.join(__dirname, 'views/camera-instance'),
     path.join(__dirname, 'views/brand'),
+    path.join(__dirname, 'views/camera-category'),
 ]);
 app.set('view engine', 'pug');
 

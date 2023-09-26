@@ -3,7 +3,15 @@ const CameraType = require('../models/camera-type');
 
 // Display list of all CameraTypes.
 exports.cameratype_list = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraType list');
+    const allCameraTypes = await CameraType.find({})
+        .select('name category')
+        .sort('category')
+        .exec();
+
+    res.render('cameratype_list', {
+        title: 'Camera Types List',
+        cameratype_list: allCameraTypes,
+    });
 });
 
 // Display detail page for a specific CameraType.

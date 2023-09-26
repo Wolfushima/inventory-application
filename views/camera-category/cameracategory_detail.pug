@@ -1,0 +1,18 @@
+extends ../layout
+
+block content 
+
+    h1 Camera Category: #{camera_category.name}
+
+    div(style='margin-left:20px;margin-top:20px')
+
+        h4 Cameras 
+
+        dl 
+            each camera in camera_category_cameras 
+                dt 
+                    a(href=camera.url) (#{camera.brand.name}) #{camera.name}
+                dd #{camera.description}
+            
+            else 
+                p This camera category has no cameras.

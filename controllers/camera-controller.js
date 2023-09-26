@@ -89,7 +89,6 @@ exports.camera_list = asyncHandler(async (req, res, next) => {
         .populate('brand')
         .exec();
 
-    console.log(allCameras);
     res.render('camera_list', {
         title: 'Camera List',
         camera_list: allCameras,

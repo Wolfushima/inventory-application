@@ -97,7 +97,27 @@ exports.camera_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Camera.
 exports.camera_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Camera detail: ${req.params.id}`);
+    const [camera, cameraInstances] = await Promise.all([
+        Camera.findById(req.params.id)
+            .populate('brand')
+            .populate('camera_category')
+            .populate('camera_type')
+            .exec(),
+        CameraInstance.find({ camera: req.params.id }).sort('-price').exec(),
+    ]);
+
+    if (camera === null) {
+        // No results.
+        const err = new Error('Camera not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('camera_detail', {
+        title: camera.name,
+        camera,
+        camera_instances: cameraInstances,
+    });
 });
 
 // Display Camera create form on GET.

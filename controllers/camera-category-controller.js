@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const CameraCategory = require('../models/camera-category');
+const Camera = require('../models/camera');
 
 // Display list of all CameraCategories.
 exports.cameracategory_list = asyncHandler(async (req, res, next) => {
@@ -15,7 +16,28 @@ exports.cameracategory_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific CameraCategory.
 exports.cameracategory_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: CameraCategory detail: ${req.params.id}`);
+    const [cameraCategory, camerasInCameraCategory] = await Promise.all([
+        CameraCategory.findById(req.params.id).exec(),
+        Camera.find({ camera_category: req.params.id })
+            .select('name brand description')
+            .populate('brand')
+            .select('name')
+            .sort('name')
+            .exec(),
+    ]);
+
+    if (cameraCategory === null) {
+        // No results.
+        const err = new Error('Camera Category not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('cameracategory_detail', {
+        title: 'Camera Detail',
+        camera_category: cameraCategory,
+        camera_category_cameras: camerasInCameraCategory,
+    });
 });
 
 // Display CameraCategory create form on GET.

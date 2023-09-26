@@ -1,0 +1,45 @@
+extends ../layout
+
+block content 
+    h1 Camera: #{camera.name}
+
+    p #[strong Brand:] 
+        a(href=camera.brand.url) #{camera.brand.name}
+    p #[strong Description:] #{camera.description}
+    p #[strong Category:] 
+        a(href=camera.camera_category.url) #{camera.camera_category.name}
+    p #[strong Type:] 
+        each type, index in camera.camera_type
+            a(href=type.url) #{type.name}
+            if index < camera.camera_type.length - 1
+                |, 
+    p #[strong Date Of Release:] #{camera.date_of_release_formatted}
+    if camera.date_of_discontinuation != null 
+        p #[strong Date Of Discontinuation:] #{camera.date_of_discontinuation_formatted}
+    p #[strong Lens Mount:] #{camera.lens_mount}
+    if camera.camera_category.name==='Film'
+        p #[strong Picture Size:] #{camera.picture_size}
+    else
+        p #[strong Resolution:] #{camera.resolution}
+    p #[strong Viewfinder:] #{camera.viewfinder}
+    p #[strong Dimensions:] #{camera.dimensions}  
+    p #[strong Weight:] #{camera.weight}  
+    
+    div(style='margin-left:20px;margin-top:20px')
+        h4 Units 
+
+        each val in camera_instances
+            hr
+            if val.condition==='New' | val.condition==='Excellent'
+                p.text-success #{val.condition}
+            else if val.condition==='Very Good' | val.condition==='Good'
+                p.text-warning #{val.condition}
+            else 
+                p.text-danger #{val.condition}
+            p #[strong Color:] #{val.color}
+            p #[strong Price:] $#{val.price}
+            p #[strong Id:] 
+                a(href=val.url) #{val._id}
+        
+        else
+            p There are no units of this camera in the inventory.

@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Brand = require('../models/brand');
+const Camera = require('../models/camera');
 
 // Display list of all Brands.
 exports.brand_list = asyncHandler(async (req, res, next) => {
@@ -13,7 +14,23 @@ exports.brand_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Brand.
 exports.brand_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: Brand detail: ${req.params.id}`);
+    const [brand, allCamerasByBrand] = await Promise.all([
+        Brand.findById(req.params.id).exec(),
+        Camera.find({ brand: req.params.id }).select('name description').exec(),
+    ]);
+
+    if (brand === null) {
+        // No result.
+        const err = new Error('Brand not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('brand_detail', {
+        title: 'Brand Detail',
+        brand,
+        brand_cameras: allCamerasByBrand,
+    });
 });
 
 // Display Brand create form on GET.

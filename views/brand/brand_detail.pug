@@ -1,0 +1,27 @@
+extends ../layout
+
+block content 
+
+    h1 Brand: #{brand.name}
+    p #{brand.description}
+
+    p #[strong Headquarters:] #{brand.headquarters}
+    p #[strong Founder:] #{brand.founder.join(', ')}
+    p #[strong Date of founding:] #{brand.date_of_founding_formatted}
+    if brand.date_of_defunct != null 
+        p #[strong Date of defunct:] #{brand.date_of_defunct_formatted}
+    p #[strong Website:] 
+        a(href=brand.website) #{brand.website}
+
+    div(style='margin-left:20px;margin-top:20px')
+
+        h4 Cameras 
+
+        dl 
+            each camera in brand_cameras
+                dt 
+                    a(href=camera.url) #{camera.name}
+                dd #{camera.description}
+
+            else 
+                p This brand has no cameras.

@@ -16,7 +16,21 @@ exports.camerainstance_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific CameraInstances.
 exports.camerainstance_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: CameraInstance detail: ${req.params.id}`);
+    const cameraInstance = await CameraInstance.findById(req.params.id)
+        .populate('camera')
+        .exec();
+
+    if (cameraInstance === null) {
+        // No results.
+        const err = new Error('Camera Instance not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('camerainstance_detail', {
+        title: 'Camera Instance detail',
+        camerainstance: cameraInstance,
+    });
 });
 
 // Display CameraInstance create form on GET.

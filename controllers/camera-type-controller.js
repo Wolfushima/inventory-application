@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const CameraType = require('../models/camera-type');
+const Camera = require('../models/camera');
 
 // Display list of all CameraTypes.
 exports.cameratype_list = asyncHandler(async (req, res, next) => {
@@ -16,7 +17,26 @@ exports.cameratype_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific CameraType.
 exports.cameratype_detail = asyncHandler(async (req, res, next) => {
-    res.send(`NOT IMPLEMENTED: CameraType detail: ${req.params.id}`);
+    const [cameraType, camerasInCameraType] = await Promise.all([
+        CameraType.findById(req.params.id).exec(),
+        Camera.find({ camera_type: req.params.id })
+            .select('name description')
+            .sort('name')
+            .exec(),
+    ]);
+
+    if (cameraType === null) {
+        // No result.
+        const err = new Error('Camera Type not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('cameratype_detail', {
+        title: 'Camera Type Detail',
+        camera_type: cameraType,
+        camera_type_cameras: camerasInCameraType,
+    });
 });
 
 // Display CameraType create form on GET.

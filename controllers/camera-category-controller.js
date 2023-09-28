@@ -34,7 +34,7 @@ exports.cameracategory_detail = asyncHandler(async (req, res, next) => {
     }
 
     res.render('cameracategory_detail', {
-        title: 'Camera Detail',
+        title: 'Camera Category Detail',
         camera_category: cameraCategory,
         camera_category_cameras: camerasInCameraCategory,
     });

@@ -1,0 +1,20 @@
+extends ../layout
+
+block content 
+
+    h1 ID: #{camerainstance._id}
+
+    p #[strong Camera:] 
+        a(href=camerainstance.camera.url) #{camerainstance.camera.name}
+    p #[strong Color:] #{camerainstance.color}
+    
+    p #[strong Price:] $#{camerainstance.price}
+    p #[strong Condition:] 
+        if camerainstance.condition=='New' | camerainstance.condition=='Excellent'
+            span.text-success #{camerainstance.condition} 
+        else if camerainstance.condition=='Very Good' | camerainstance.condition=='Good'
+            span.text-warning #{camerainstance.condition} 
+        else
+            span.text-danger #{camerainstance.condition} 
+        if camerainstance.condiiton!='New'
+            span (Used)

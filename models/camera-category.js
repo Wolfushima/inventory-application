@@ -6,7 +6,8 @@ const CameraCategorySchema = new Schema({
     name: {
         type: String,
         required: true,
-        enum: ['Digital', 'Film'],
+        minLength: 1,
+        maxLength: 100,
     },
     description: { type: String, required: true },
 });

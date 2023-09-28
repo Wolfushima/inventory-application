@@ -1,0 +1,18 @@
+extends ../layout
+
+block content 
+
+    h1 Camera Type: #{camera_type.name}
+
+    div(style='margin-left:20px;margin-top:20px')
+
+        h4 Cameras 
+
+        dl 
+            each camera in camera_type_cameras 
+                dt 
+                    a(href=camera.url) #{camera.name}
+                dd #{camera.description}
+            
+            else
+                p This camera type has no cameras.

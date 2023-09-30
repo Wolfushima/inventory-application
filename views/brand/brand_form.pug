@@ -1,0 +1,87 @@
+extends ../layout
+
+block content 
+    h1 #{title}
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Brand Name: 
+            input#name.form-control(
+                type='text'
+                placeholder='Brand name'
+                name='name'
+                value=(undefined===brand ? '' : brand.name)
+                required='true'
+            )
+        div.form-group
+            label(for='description') Description 
+            textarea#description.form-control(
+                type='textarea'
+                placeholder='Description'
+                name='description'
+                value=(undefined===brand ? '' : brand.description)
+                required='true'
+            )
+        div.form-group
+            label(for='date_of_founding') Date Of Founding: 
+            input#date_of_founding.form-control(
+                type='date'
+                placeholder='dd/mm/yyyy'
+                name='date_of_founding'
+                value=(undefined===brand ? '' : brand.date_of_founding)
+            )
+        div.form-group
+            label(for='date_of_defunct') Date Of Defunct: 
+            input#date_of_defunct.form-control(
+                type='date'
+                placeholder='dd/mm/yyyy'
+                name='date_of_defunct'
+                value=(undefined===brand ? '' : brand.date_of_defunct)
+            )
+        
+        div.form-group
+            label Founder:
+            input.form-control(
+                type='text'
+                placeholder='Founder'
+                name='founder'
+                value=(undefined===brand ? '' : brand.founder.join(', '))
+            )
+            button#addFounder.btn.btn-secondary(type='button' style='margin-top:20px;') Add Founder
+
+        script.
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('addFounder').addEventListener('click', function() {
+                    const founderInput = document.createElement('input');
+                    founderInput.type = 'text';
+                    founderInput.placeholder = 'Founder';
+                    founderInput.name = 'founder';
+                    founderInput.className = 'form-control';
+                    founderInput.style = 'margin-top:20px;';
+                    document.querySelector("div.form-group input[name='founder']:last-of-type").after(founderInput);
+                });
+            });
+        
+        div.form-group
+            label(for='headquarters') Headquarters: 
+            input#headquarters.form-control(
+                type='text'
+                placeholder='Headquarters'
+                name='headquarters'
+                value=(undefined===brand ? '' : brand.headquarters)
+            )
+        div.form-group
+            label(for='website') Website: 
+            input#website.form-control(
+                type='text'
+                placeholder='Website'
+                name='website'
+                value=(undefined===brand ? '' : brand.website)
+            )
+        button.btn.btn-primary(type='submit') Submit
+    
+    if errors 
+        ul 
+            for error in errors 
+                li!= error.msg
+    

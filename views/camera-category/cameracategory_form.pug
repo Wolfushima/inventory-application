@@ -9,7 +9,8 @@ block content
             input#name.form-control(
                 type='text'
                 placeholder='Film, Digital, etc.'
-                name='name' value=(undefined===camera_category ? '' : camera_category.name)
+                name='name'
+                value=(undefined===camera_category ? '' : camera_category.name)
                 required='true'
             )
         div.form-group

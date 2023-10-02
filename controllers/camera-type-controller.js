@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 const CameraType = require('../models/camera-type');
 const Camera = require('../models/camera');
 
@@ -41,13 +42,56 @@ exports.cameratype_detail = asyncHandler(async (req, res, next) => {
 
 // Display CameraType create form on GET.
 exports.cameratype_create_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraType create GET');
+    res.render('cameratype_form', { title: 'Create Camera Type' });
 });
 
 // Handle CameraType create on POST.
-exports.cameratype_create_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraType create POST');
-});
+exports.cameratype_create_post = [
+    // Validate and sanitize fields.
+    body('name', 'Name must not be empty.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('category').escape(),
+    body('description', 'Description must not be empty.').trim().escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create CameraType object with escaped and trimmed data.
+        const cameraType = new CameraType({
+            name: req.body.name,
+            category: req.body.category,
+            description: req.body.description,
+        });
+
+        if (!errors.isEmpty) {
+            // There are errors. Render form again with sanitized values/error messages.
+            res.render('cameratype_form', {
+                title: 'Create Camera Type',
+                camera_type: cameraType,
+                errors: errors.array(),
+            });
+        }
+
+        // Data from form is valid.
+        // Check if CameraType with same name and category already exists.
+        const cameraTypeExists = await CameraType.findOne({
+            name: req.body.name,
+            category: req.body.category,
+        }).exec();
+        if (cameraTypeExists) {
+            // CameraType exists, redirect to its detail page.
+            res.redirect(cameraTypeExists.url);
+        } else {
+            await cameraType.save();
+            // New cameratype saved. Redirect to cameratype detail page.
+            res.redirect(cameraType.url);
+        }
+    }),
+];
 
 // Display CameraType delete form on GET.
 exports.cameratype_delete_get = asyncHandler(async (req, res, next) => {

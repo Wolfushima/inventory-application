@@ -1,0 +1,44 @@
+extends ../layout
+
+block content 
+    h1 #{title}
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Camera Type: 
+            input#name.form-control(
+                type='text'
+                placeholder='DSLR, Mirrorless, 4k, etc.'
+                name='name'
+                value=(undefined===camera_type ? '' : camera_type.name)
+                required='true'
+            )
+        div.form-group
+            label(for='description') Description: 
+            textarea#description.form-control(
+                type='textarea'
+                placeholder='Description'
+                name='description'
+                value=(undefined===camera_type ? '' : camera_type.description)
+                required='true'
+            )
+        fieldset#category.form-group(type='fieldset')
+            legend.col-form-label Category:
+            div.form-check(style='display: inline; padding-right: 10px;')
+                input.form-check-input(
+                    type='radio'
+                    name='category'
+                    id='category-digital'
+                    value='Digital'
+                    checked='true'
+                )
+                label(for='category-digital') Digital
+            div.form-check(style='display: inline; padding-right: 10px;')
+                input.form-check-input(
+                    type='radio'
+                    name='category'
+                    id='category-film'
+                    value='Film'
+                )
+                label(for='category-film') Film
+        button.btn.btn-primary(type='submit') Submit 

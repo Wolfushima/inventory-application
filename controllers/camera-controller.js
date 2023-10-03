@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 const Camera = require('../models/camera');
 const Brand = require('../models/brand');
 const CameraCategory = require('../models/camera-category');
@@ -122,13 +123,116 @@ exports.camera_detail = asyncHandler(async (req, res, next) => {
 
 // Display Camera create form on GET.
 exports.camera_create_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Camera create GET');
+    const [allBrands, allCameraCategories, allCameraTypes] = await Promise.all([
+        Brand.find().exec(),
+        CameraCategory.find().exec(),
+        CameraType.find().exec(),
+    ]);
+
+    res.render('camera_form', {
+        title: 'Create Camera',
+        brands: allBrands,
+        camera_categories: allCameraCategories,
+        camera_types: allCameraTypes,
+    });
 });
 
 // Handle Camera create on POST.
-exports.camera_create_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Camera create POST');
-});
+exports.camera_create_post = [
+    // Convert cameratype to an array.
+    (req, res, next) => {
+        if (!(req.body.camera_type instanceof Array)) {
+            if (typeof req.body.camera_type === 'undefined')
+                req.body.camera_type = [];
+            else req.body.camera_type = new Array(req.body.camera_type);
+        }
+        next();
+    },
+
+    // Validate and sanitize fields.
+    body('name', 'Name must not be empty.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('brand', 'Brand must not be empty.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('camera_category', 'Category must not be empty').escape(),
+    body('camera_type.*').escape(),
+    body('description', 'Description must not be empty')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('date_of_release', 'Invalid date.')
+        .optional({ values: 'falsy' })
+        .isISO8601()
+        .toDate(),
+    body('date_of_discontinuation', 'Invalid date.')
+        .optional({ values: 'falsy' })
+        .isISO8601()
+        .toDate(),
+    body('lens_mount').trim().escape(),
+    body('picture_size').trim().escape(),
+    body('resolution').trim().escape(),
+    body('viewfinder').trim().escape(),
+    body('dimensions').trim().escape(),
+    body('weight').trim().escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a Camera object with escaped and trimmed data.
+        const camera = new Camera({
+            name: req.body.name,
+            brand: req.body.brand,
+            camera_category: req.body.camera_category,
+            camera_type: req.body.camera_type,
+            description: req.body.description,
+            date_of_release: req.body.date_of_release,
+            date_of_discontinuation: req.body.date_of_discontinuation,
+            lens_mount: req.body.lens_mount,
+            picture_size: req.body.picture_size,
+            resolution: req.body.resolution,
+            viewfinder: req.body.viewfinder,
+            dimensions: req.body.dimensions,
+            weight: req.body.dimensions,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render form again with sanitized values/error messages.
+            // Get brand, cameracategory and cameratype for form.
+            const [allBrands, allCameraCategories, allCameraTypes] =
+                await Promise.all([
+                    Brand.find().exec(),
+                    CameraCategory.find().exec(),
+                    CameraType.find().exec(),
+                ]);
+
+            // Mark selected cameratypes as checked.
+            for (const cameraType of allCameraTypes) {
+                if (camera.camera_type.includes(camera_type._id)) {
+                    cameraType.checked = 'true';
+                }
+            }
+
+            res.render('camera_form', {
+                title: 'Create Camera',
+                brands: allBrands,
+                camera_categories: allCameraCategories,
+                camera_types: allCameraTypes,
+                camera,
+                errors: errors.array(),
+            });
+        } else {
+            // Data from form is valid. Save camera.
+            await camera.save();
+            res.redirect(camera.url);
+        }
+    }),
+];
 
 // Display Camera delete form on GET.
 exports.camera_delete_get = asyncHandler(async (req, res, next) => {

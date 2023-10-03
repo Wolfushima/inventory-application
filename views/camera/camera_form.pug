@@ -1,0 +1,140 @@
+extends ../layout
+
+block content 
+    h1 #{title}
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='name') Camera Name: 
+            input#name.form-control(
+                type='text'
+                placeholder='Camera name'
+                name='name'
+                value=(undefined===camera ? '' : camera.name)
+                required='true'
+            )
+        div.form-group
+            label(for='brand') Brand: 
+            select#brand.form-control(
+                type='select'
+                placeholder='Select brand'
+                name='brand'
+                required='true'
+            )
+                - brands.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                for brand in brands 
+                    if camera 
+                        option(
+                            value=brand._id
+                            selected=(brand._id.toString()===camera.brand._id.toString() ? 'selected' : false)
+                        ) #{brand.name}
+                    else 
+                        option(value=brand._id) #{brand.name}
+        div.form-group
+            label(for='camera_category') Category: 
+            select#camera_category.form-control(
+                type='select'
+                placeholder='Select category'
+                name='camera_category'
+                required='true'
+            )
+                for category in camera_categories
+                    if camera 
+                        option(
+                            value=camera_category._id 
+                            selected=(camera_category._id.toString()===camera.camera_category.toString() ? 'selected' : false)
+                        ) #{category.name}
+                    else 
+                        option(value=category._id) #{category.name} 
+        div.form-group
+            label Type: 
+            div.col-sm-10.row
+                for cameraType in camera_types 
+                    div.form-check(style='display: inline; padding-right:10px;')
+                        input.form-check-input(
+                            type='checkbox'
+                            name='camera_type'
+                            id=cameraType._id 
+                            value=cameraType._id 
+                            checked=cameraType.checked
+                        )
+                        label.form-check-label(for=cameraType._id) #{cameraType.name}
+        div.form-group
+            label(for='description') Description 
+            textarea#description.form-control(
+                type='textarea'
+                placeholder='Description'
+                name='description'
+                value=(undefined===camera ? '' : camera.description)
+                required='true'
+            )
+        div.form-group
+            label(for='date_of_release') Date Of Release: 
+            input#date_of_release.form-control(
+                type='date'
+                placeholder='dd/mm/yyyy'
+                name='date_of_release'
+                value=(undefined===camera ? '' : camera.date_of_release)
+            )
+        div.form-group
+            label(for='date_of_discontinuation') Date Of Discontinuation: 
+            input#date_of_discontinuation.form-control(
+                type='date'
+                placeholder='dd/mm/yyyy'
+                name='date_of_discontinuation'
+                value=(undefined===brand ? '' : brand.date_of_discontinuation)
+            )
+        div.form-group
+            label(for='lens_mount') Lens Mount: 
+            input#lens_mount.form-control(
+                type='text'
+                placeholder='Lens mount'
+                name='lens_mount'
+                value=(undefined===camera ? '' : camera.lens_mount)
+            )
+        div.form-group
+            label(for='picture_size') Picture Size: 
+            input#picture_size.form-control(
+                type='text'
+                placeholder='Picture size'
+                name='picture_size'
+                value=(undefined===camera ? '' : camera.picture_size)
+            )
+        div.form-group
+            label(for='resolution') Resolution: 
+            input#resolution.form-control(
+                type='text'
+                placeholder='Resolution'
+                name='resolution'
+                value=(undefined===camera ? '' : camera.resolution)
+            )
+        div.form-group
+            label(for='viewfinder') Viewfinder: 
+            input#viewfinder.form-control(
+                type='text'
+                placeholder='Viewfinder'
+                name='viewfinder'
+                value=(undefined===camera ? '' : camera.viewfinder)
+            )
+        div.form-group
+            label(for='dimensions') Dimensions: 
+            input#dimensions.form-control(
+                type='text'
+                placeholder='Dimensions'
+                name='dimensions'
+                value=(undefined===camera ? '' : camera.dimensions)
+            )
+        div.form-group
+            label(for='weight') Weight: 
+            input#weight.form-control(
+                type='text'
+                placeholder='Weight'
+                name='weight'
+                value=(undefined===camera ? '' : camera.weight)
+            )
+        button.btn.btn-primary(type='submit') Submit
+
+    if errors
+        ul
+            for error in errors
+                li!= error.msg

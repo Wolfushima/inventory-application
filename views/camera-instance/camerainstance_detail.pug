@@ -18,3 +18,7 @@ block content
             span.text-danger #{camerainstance.condition} 
         if camerainstance.condition!='New'
             span (Used)
+    
+    hr
+    p
+        a(href=camerainstance.url+'/delete') Delete Camera Instance

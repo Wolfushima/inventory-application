@@ -1,0 +1,72 @@
+extends ../layout
+
+block content 
+    h1 #{title}
+
+    form(method='POST' action='')
+        div.form-group
+            label(for='camera') Camera: 
+            select#camera.form-control(
+                type='select'
+                placeholder='Select Camera'
+                name='camera'
+                required='true'
+            )
+                - camera_list.sort(function(a, b) {let textA = a.name.toUpperCase(); let textB = b.name.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+                for camera in camera_list 
+                    option(
+                        value=camera._id 
+                        selected=(selected_camera==camera._id.toString() ? 'selected' : false)
+                    ) #{camera.name}
+        div.form-group
+            label(for='color') Color: 
+            input#color.form-control(
+                type='text'
+                placeholder='Color'
+                name='color'
+                required='true'
+                value=(undefined===camera_instance ? '' : camera_instance.color)
+            )
+        div.form-group
+            label(for='condition') Condition: 
+            select#condition.form-control(
+                type='select'
+                placeholder='Select condition'
+                name='condition'
+                required='true'
+            )
+                option(
+                    value='New'
+                    selected=(undefined===camera_instance || camera_instance.condition!='New' ? false : 'selected')
+                ) New 
+                option(
+                    value='Excellent'
+                    selected=(undefined===camera_instance || camera_instance.condition!='Excellent' ? false : 'selected')
+                ) Excellent 
+                option(
+                    value='Very Good'
+                    selected=(undefined===camera_instance || camera_instance.condition!='Very Good' ? false : 'selected')
+                ) Very Good 
+                option(
+                    value='Good'
+                    selected=(undefined===camera_instance || camera_instance.condition!='Good' ? false : 'selected')
+                ) Good 
+                option(
+                    value='For Parts or Not Working'
+                    selected=(undefined===camera_instance || camera_instance.condition!='For Parts or Not Working' ? false : 'selected')
+                ) For Parts or Not Working 
+        div.form-group
+            label(for='price') Price: 
+            input#price.form-control(
+                type='text'
+                placeholder='Price'
+                name='price'
+                require='true'
+                value=(undefined===camera_instance ? '' : camera_instance.price)
+            )
+        button.btn.btn-primary(type='submit') Submit 
+    
+    if errors 
+        ul
+            for error in errors 
+                li!= error.msg

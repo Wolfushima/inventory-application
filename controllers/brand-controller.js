@@ -108,12 +108,43 @@ exports.brand_create_post = [
 
 // Display Brand delete form on GET.
 exports.brand_delete_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Brand delete GET');
+    const [brand, allCamerasByBrand] = await Promise.all([
+        Brand.findById(req.params.id).exec(),
+        Camera.find({ brand: req.params.id }).select('name description').exec(),
+    ]);
+
+    if (brand === null) {
+        // No results.
+        res.redirect('/catalog/brands');
+    }
+
+    res.render('brand_delete', {
+        title: 'Delete Brand',
+        brand,
+        brand_cameras: allCamerasByBrand,
+    });
 });
 
 // Handle Brand delete on POST.
 exports.brand_delete_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Brand delete POST');
+    const [brand, allCamerasByBrand] = await Promise.all([
+        Brand.findById(req.params.id).exec(),
+        Camera.find({ brand: req.params.id }).select('name description').exec(),
+    ]);
+
+    if (allCamerasByBrand.length > 0) {
+        // Brand has cameras.
+        res.render('brand_delete', {
+            title: 'Delete Brand',
+            brand,
+            brand_cameras: allCamerasByBrand,
+        });
+        return;
+    }
+
+    // Brand has no books.
+    await Brand.findByIdAndRemove(req.body.brandid);
+    res.redirect('/catalog/brands');
 });
 
 // Display Brand update form on GET.

@@ -1,0 +1,31 @@
+extends ../layout
+
+block content 
+    h1 #{title}: #{brand.name}
+    p= brand.description
+    
+    if brand_cameras.length 
+        p #[strong Delete the following cameras before attempting to delete this brand.]
+
+        div(style='margin-left:20px;margin-top:20px')
+
+            h4 Cameras 
+
+            dl 
+            each camera in brand_cameras 
+                dt 
+                    a(href=camera.url) #{camera.name}
+                dd #{camera.description}
+    
+    else 
+        p Do you really want to delete this Brand?
+
+        form(method='POST' action='')
+            div.form-group
+                input#brandid.form-control(
+                    type='hidden'
+                    name='brandid'
+                    required='true'
+                    value=brand._id
+                )
+            button.btn.btn-primary(type='submit') Delete

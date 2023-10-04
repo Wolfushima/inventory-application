@@ -94,12 +94,26 @@ exports.camerainstance_create_post = [
 
 // Display CameraInstance delete form on GET.
 exports.camerainstance_delete_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance delete GET');
+    const cameraInstance = await CameraInstance.findById(req.params.id)
+        .populate('camera')
+        .exec();
+
+    if (cameraInstance === null) {
+        // No result.
+        res.redirect('/catalog/camerainstances');
+    }
+
+    res.render('camerainstance_delete', {
+        title: 'Delete Camera Instance (Unit)',
+        camera_instance: cameraInstance,
+    });
 });
 
 // Handle CameraInstance delete on POST.
 exports.camerainstance_delete_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance delete POST');
+    // Assume valid CameraInstance id in field.
+    await CameraInstance.findByIdAndRemove(req.body.id);
+    res.redirect('/catalog/camerainstances');
 });
 
 // Display CameraInstance update form on GET.

@@ -1,0 +1,61 @@
+extends ../layout
+
+block content 
+    h1 #{title}: #{camera.name}
+
+    p #[strong Brand:] 
+        a(href=camera.brand.url) #{camera.brand.name}
+    p #[strong Description:] #{camera.description}
+    p #[strong Category:] 
+        a(href=camera.camera_category.url) #{camera.camera_category.name}
+    p #[strong Type:] 
+        each type, index in camera.camera_type
+            a(href=type.url) #{type.name}
+            if index < camera.camera_type.length - 1
+                |, 
+    p #[strong Date Of Release:] #{camera.date_of_release_formatted}
+    if camera.date_of_discontinuation != null 
+        p #[strong Date Of Discontinuation:] #{camera.date_of_discontinuation_formatted}
+    p #[strong Lens Mount:] #{camera.lens_mount}
+    if camera.camera_category.name==='Film'
+        p #[strong Picture Size:] #{camera.picture_size}
+    else
+        p #[strong Resolution:] #{camera.resolution}
+    p #[strong Viewfinder:] #{camera.viewfinder}
+    p #[strong Dimensions:] #{camera.dimensions}  
+    p #[strong Weight:] #{camera.weight}  
+
+    hr
+
+    if camera_instances.length 
+        p #[strong Delete the following camera units before attempting to delete this camera.]
+
+        div(style='margin-left:20px;margin-top:20px;')
+
+            h4 Camera Units 
+
+            each camera_unit in camera_instances
+                hr
+                if camera_unit.condition==='New' | camera_unit.condition==='Excellent'
+                    p.text-success #{camera_unit.condition}
+                else if camera_unit.condition==='Very Good' | camera_unit.condition==='Good'
+                    p.text-warning #{camera_unit.condition}
+                else 
+                    p.text-danger #{camera_unit.condition}
+                p #[strong Color:] #{camera_unit.color}
+                p #[strong Price:] $#{camera_unit.price}
+                p #[strong Id:] 
+                    a(href=camera_unit.url) #{camera_unit._id}
+    
+    else 
+        p Do you really want to delete this Camera?
+
+        form(method='POST' action='')
+            div.form-group
+                input#id.form-control(
+                    type='hidden'
+                    name='id'
+                    required='true'
+                    value=camera._id
+                )
+            button.btn.btn-primary(type='submit') Delete

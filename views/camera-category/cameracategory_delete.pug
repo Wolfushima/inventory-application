@@ -1,0 +1,30 @@
+extends ../layout
+
+block content 
+    h1 Delete Camera Category: #{camera_category.name}
+
+    if camera_category_cameras.length
+        p #[strong Delete the following cameras before attempting to delete this camera category.]
+
+        div(style='margin-left:20px;margin-top:20px;')
+
+            h4 Cameras 
+
+            dl 
+            each camera in camera_category_cameras 
+                dt 
+                    a(href=camera.url) #{camera.name}
+                dd #{camera.description}
+    
+    else
+        p Do you really want to delete this Camera Category?
+
+        form(method='POST' action='')
+            div.form-group
+                input#id.form-control(
+                    type='hidden'
+                    name='id'
+                    required='true'
+                    value=camera_category._id
+                )
+            button.btn.btn-primary(type='submit') Delete

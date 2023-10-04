@@ -97,12 +97,47 @@ exports.cameracategory_create_post = [
 
 // Display CameraCategory delete form on GET.
 exports.cameracategory_delete_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraCategory delete GET');
+    const [cameraCategory, camerasInCameraCategory] = await Promise.all([
+        CameraCategory.findById(req.params.id).exec(),
+        Camera.find({ camera_category: req.params.id })
+            .select('name description')
+            .exec(),
+    ]);
+
+    if (cameraCategory === null) {
+        // No results.
+        res.redirect('/catalog/cameracategories');
+    }
+
+    res.render('cameracategory_delete', {
+        title: 'Delete Camera Category',
+        camera_category: cameraCategory,
+        camera_category_cameras: camerasInCameraCategory,
+    });
 });
 
 // Handle CameraCategory delete on POST.
 exports.cameracategory_delete_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraCategory delete POST');
+    const [cameraCategory, camerasInCameraCategory] = await Promise.all([
+        CameraCategory.findById(req.params.id).exec(),
+        Camera.find({ camera_category: req.params.id })
+            .select('name description')
+            .exec(),
+    ]);
+
+    if (camerasInCameraCategory.lenght > 0) {
+        // CameraCategory has cameras.
+        res.render('cameracategory_delete', {
+            title: 'Delete Camera Category',
+            camera_category: cameraCategory,
+            camera_category_cameras: camerasInCameraCategory,
+        });
+        return;
+    }
+
+    // CameraCategory has no cameras.
+    await CameraCategory.findByIdAndRemove(req.body.id);
+    res.redirect('/catalog/cameracategories');
 });
 
 // Display CameraCategory update form on GET.

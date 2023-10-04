@@ -236,12 +236,57 @@ exports.camera_create_post = [
 
 // Display Camera delete form on GET.
 exports.camera_delete_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Camera delete GET');
+    const [camera, cameraInstances] = await Promise.all([
+        Camera.findById(req.params.id)
+            .populate('brand')
+            .populate('camera_category')
+            .populate('camera_type')
+            .exec(),
+        CameraInstance.find({ camera: req.params.id }).exec(),
+    ]);
+
+    if (camera === null) {
+        // No results.
+        res.redirect('/catalog/cameras');
+    }
+
+    res.render('camera_delete', {
+        title: 'Delete Camera',
+        camera,
+        camera_instances: cameraInstances,
+    });
 });
 
 // Handle Camera delete on POST.
 exports.camera_delete_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Camera delete POST');
+    // Asume the post has a valid id (ie no validation/sanitization)
+    const [camera, cameraInstances] = await Promise.all([
+        Camera.findById(req.params.id)
+            .populate('brand')
+            .populate('camera_category')
+            .populate('camera_type')
+            .exec(),
+        CameraInstance.find({ camera: req.params.id }).exec(),
+    ]);
+
+    if (camera === null) {
+        // No results.
+        res.redirect('catalog/cameras');
+    }
+
+    if (cameraInstances.lenght > 0) {
+        // Cameras has camera_instances.
+        res.render('camera_delete', {
+            title: 'Delete Camera',
+            camera,
+            camera_instances: cameraInstances,
+        });
+        return;
+    }
+
+    // Camera has no CameraInstance objects.
+    await Camera.findByIdAndRemove(req.body.id);
+    res.redirect('/catalog/cameras');
 });
 
 // Display Camera update form on GET.

@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 const CameraInstance = require('../models/camera-instance');
+const Camera = require('../models/camera');
 
 // Display list of all CameraInstances.
 exports.camerainstance_list = asyncHandler(async (req, res, next) => {
@@ -35,13 +37,60 @@ exports.camerainstance_detail = asyncHandler(async (req, res, next) => {
 
 // Display CameraInstance create form on GET.
 exports.camerainstance_create_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance create GET');
+    const allCameras = await Camera.find().select('name').exec();
+
+    res.render('camerainstance_form', {
+        title: 'Create Camera Instance (Unit)',
+        camera_list: allCameras,
+    });
 });
 
 // Handle CameraInstance create on POST.
-exports.camerainstance_create_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance create POST');
-});
+exports.camerainstance_create_post = [
+    // Validate and sanitize fields.
+    body('camera', 'Camera must be specified.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('color', 'Color must be specified.')
+        .trim()
+        .isLength({ min: 2 })
+        .escape(),
+    body('condition').escape(),
+    body('price', 'Price must be in numbers.').trim().isNumeric().escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from the request.
+        const errors = validationResult(req);
+
+        // Create a CameraInstance object with escaped and trimmed data.
+        const cameraInstance = new CameraInstance({
+            camera: req.body.camera,
+            color: req.body.color,
+            condition: req.body.condition,
+            price: req.body.price,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors.
+            // Render form again with sanitized values and error messages.
+            const allCameras = await Camera.find().select('name').exec();
+
+            res.render('camerainstance_form', {
+                title: 'Create Camera Instance (Unit)',
+                camera_list: allCameras,
+                selected_camera: cameraInstance.camera._id,
+                errors: errors.array(),
+                camera_instance: cameraInstance,
+            });
+            return;
+        }
+        // Data from form is valid.
+        await cameraInstance.save();
+        res.redirect(cameraInstance.url);
+    }),
+];
 
 // Display CameraInstance delete form on GET.
 exports.camerainstance_delete_get = asyncHandler(async (req, res, next) => {

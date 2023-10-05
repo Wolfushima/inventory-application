@@ -41,8 +41,8 @@ block content
                 for category in camera_categories
                     if camera 
                         option(
-                            value=camera_category._id 
-                            selected=(camera_category._id.toString()===camera.camera_category.toString() ? 'selected' : false)
+                            value=category._id 
+                            selected=(category._id.toString()===camera.camera_category._id.toString() ? 'selected' : false)
                         ) #{category.name}
                     else 
                         option(value=category._id) #{category.name} 
@@ -65,9 +65,8 @@ block content
                 type='textarea'
                 placeholder='Description'
                 name='description'
-                value=(undefined===camera ? '' : camera.description)
                 required='true'
-            )
+            ) #{(undefined===camera ? '' : camera.description)}
         div.form-group
             label(for='date_of_release') Date Of Release: 
             input#date_of_release.form-control(

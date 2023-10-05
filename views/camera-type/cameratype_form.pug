@@ -18,10 +18,9 @@ block content
             textarea#description.form-control(
                 type='textarea'
                 placeholder='Description'
-                name='description'
-                value=(undefined===camera_type ? '' : camera_type.description)
+                name='description'                
                 required='true'
-            )
+            ) #{(undefined===camera_type ? '' : camera_type.description)}
         fieldset#category.form-group(type='fieldset')
             legend.col-form-label Category:
             div.form-check(style='display: inline; padding-right: 10px;')

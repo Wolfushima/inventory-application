@@ -19,9 +19,8 @@ block content
                 type='textarea'
                 placeholder='Description'
                 name='description'
-                value=(undefined===camera_category ? '' : camera_category.description)
                 required='true'
-            )
+            ) #{(undefined===camera_category ? '' : camera_category.description)}
         button.btn.btn-primary(type='submit') Submit 
 
     if errors 

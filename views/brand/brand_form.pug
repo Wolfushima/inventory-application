@@ -19,9 +19,8 @@ block content
                 type='textarea'
                 placeholder='Description'
                 name='description'
-                value=(undefined===brand ? '' : brand.description)
                 required='true'
-            )
+            ) #{(undefined===brand ? '' : brand.description)}
         div.form-group
             label(for='date_of_founding') Date Of Founding: 
             input#date_of_founding.form-control(

@@ -40,15 +40,32 @@ block content
         
         div.form-group
             label Founder:
-            input.form-control(
-                type='text'
-                placeholder='Founder'
-                name='founder'
-                value=(undefined===brand ? '' : brand.founder.join(', '))
-            )
-            button#addFounder.btn.btn-secondary(type='button' style='margin-top:20px;') Add Founder
+            if brand
+                each founder in brand.founder 
+                    input.form-control(
+                        type='text'
+                        placeholder='Founder'
+                        name='founder'
+                        value=(undefined===brand ? '' : founder)
+                        style='margin-bottom:20px;'
+                    )
+            else 
+                input.form-control(
+                    type='text'
+                    placeholder='Founder'
+                    name='founder'
+                    value=(undefined===brand ? '' : brand.founder)
+                    style='margin-bottom:20px;'
+                )
+            button#addFounder.btn.btn-secondary(type='button' style='margin-right:20px;') Add Founder
+            button.btn.btn-danger(type='button' onclick='removeFounder()') Remove Last Founder
 
         script.
+            const removeFounder = function() {
+                const founderInputs = document.querySelectorAll("div.form-group input[name='founder']");
+                if (founderInputs.length === 1) return;
+                document.querySelector("div.form-group input[name='founder']:last-of-type").remove();
+            };
             document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('addFounder').addEventListener('click', function() {
                     const founderInput = document.createElement('input');
@@ -56,7 +73,7 @@ block content
                     founderInput.placeholder = 'Founder';
                     founderInput.name = 'founder';
                     founderInput.className = 'form-control';
-                    founderInput.style = 'margin-top:20px;';
+                    founderInput.style = 'margin-top:20px;margin-bottom:20px';
                     document.querySelector("div.form-group input[name='founder']:last-of-type").after(founderInput);
                 });
             });

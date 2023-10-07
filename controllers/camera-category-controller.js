@@ -142,10 +142,57 @@ exports.cameracategory_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display CameraCategory update form on GET.
 exports.cameracategory_update_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraCategory update GET');
+    const cameraCategory = await CameraCategory.findById(req.params.id).exec();
+
+    if (cameraCategory === null) {
+        // No result.
+        const err = new Error('Camera Category not found.');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('cameracategory_form', {
+        title: 'Update Camera Category',
+        camera_category: cameraCategory,
+    });
 });
 
 // Handle CameraCategory update on POST.
-exports.cameracategory_update_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraCategory update POST');
-});
+exports.cameracategory_update_post = [
+    // Validate and sanitize fields.
+    body('name', 'Camera Category must contain at least 3 characters.')
+        .trim()
+        .isLength({ min: 3 })
+        .escape(),
+    body('description', 'Description must not be empty.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a cameracategory object with escaped and trimmed data.
+        const cameraCategory = new CameraCategory({
+            name: req.body.name,
+            description: req.body.description,
+            _id: req.params.id,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Render the form again with sanitized values/error messages.
+            res.render('cameracategory_form', {
+                title: 'Update Camera Category',
+                camera_category: cameraCategory,
+                errors: errors.array(),
+            });
+            return;
+        }
+
+        // Data from form is valid.
+        await CameraCategory.findByIdAndUpdate(req.params.id, cameraCategory);
+        res.redirect(cameraCategory.url);
+    }),
+];

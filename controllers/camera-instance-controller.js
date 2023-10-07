@@ -118,10 +118,74 @@ exports.camerainstance_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display CameraInstance update form on GET.
 exports.camerainstance_update_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance update GET');
+    const [cameraInstance, allCameras] = await Promise.all([
+        CameraInstance.findById(req.params.id).populate('camera').exec(),
+        Camera.find().exec(),
+    ]);
+
+    if (cameraInstance === null) {
+        // No result.
+        const err = new Error('Camera Instance not found.');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('camerainstance_form', {
+        title: 'Update Camera Instance (Unit)',
+        camera_list: allCameras,
+        selected_camera: cameraInstance.camera._id,
+        camera_instance: cameraInstance,
+    });
 });
 
 // Handle CameraInstance update on POST.
-exports.camerainstance_update_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraInstance update POST');
-});
+exports.camerainstance_update_post = [
+    // Validate and sanitize fields.
+    body('camera', 'Camera must be specified.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('color', 'Color must be specified.')
+        .trim()
+        .isLength({ min: 2 })
+        .escape(),
+    body('condition').escape(),
+    body('price', 'Price must be in numbers.').trim().isNumeric().escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from the request.
+        const errors = validationResult(req);
+
+        // Create a CameraInstance object with escaped and trimmed data and current id.
+        const cameraInstance = new CameraInstance({
+            camera: req.body.camera,
+            color: req.body.color,
+            condition: req.body.condition,
+            price: req.body.price,
+            _id: req.params.id,
+        });
+
+        if (!errors.isEmpty()) {
+            // There are errors.
+            // Render form again with sanitized values and error messages.
+            const allCameras = await Camera.find().select('name').exec();
+
+            res.render('camerainstance_form', {
+                title: 'Create Camera Instance (Unit)',
+                camera_list: allCameras,
+                selected_camera: cameraInstance.camera._id,
+                errors: errors.array(),
+                camera_instance: cameraInstance,
+            });
+            return;
+        }
+        // Data from form is valid.
+        await CameraInstance.findByIdAndUpdate(
+            req.params.id,
+            cameraInstance,
+            {},
+        );
+        res.redirect(cameraInstance.url);
+    }),
+];

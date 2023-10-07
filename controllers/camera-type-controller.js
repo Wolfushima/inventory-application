@@ -140,10 +140,56 @@ exports.cameratype_delete_post = asyncHandler(async (req, res, next) => {
 
 // Display CameraType update form on GET.
 exports.cameratype_update_get = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraType update GET');
+    const cameraType = await CameraType.findById(req.params.id).exec();
+
+    if (cameraType === null) {
+        // No result.
+        const err = new Error('Camera Type not found.');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('cameratype_form', {
+        title: 'Update Camera Type',
+        camera_type: cameraType,
+    });
 });
 
 // Handle CameraType update on POST.
-exports.cameratype_update_post = asyncHandler(async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: CameraType update POST');
-});
+exports.cameratype_update_post = [
+    // Validate and sanitize fields.
+    body('name', 'Name must not be empty.')
+        .trim()
+        .isLength({ min: 1 })
+        .escape(),
+    body('category').escape(),
+    body('description', 'Description must not be empty.').trim().escape(),
+
+    // Process request after validation and sanitization.
+    asyncHandler(async (req, res, next) => {
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create CameraType object with escaped and trimmed data and current id.
+        const cameraType = new CameraType({
+            name: req.body.name,
+            category: req.body.category,
+            description: req.body.description,
+            _id: req.params.id,
+        });
+
+        if (!errors.isEmpty) {
+            // There are errors. Render form again with sanitized values/error messages.
+            res.render('cameratype_form', {
+                title: 'Create Camera Type',
+                camera_type: cameraType,
+                errors: errors.array(),
+            });
+            return;
+        }
+
+        // Data from form is valid.
+        await CameraType.findByIdAndUpdate(req.params.id, cameraType);
+        res.redirect(cameraType.url);
+    }),
+];

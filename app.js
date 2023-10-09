@@ -7,11 +7,20 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const compression = require('compression');
 const helmet = require('helmet');
+const RateLimit = require('express-rate-limit');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
 
 const app = express();
+
+// Set up rate limiter: maximum of twenty requests per minute
+const limiter = RateLimit({
+    windowMs: 1 * 10 * 1000, // 10 seconds
+    max: 10,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
 
 // Set up mongoose connection
 mongoose.set('strictQuery', false);
